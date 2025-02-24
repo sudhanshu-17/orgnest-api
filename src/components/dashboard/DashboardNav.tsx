@@ -24,9 +24,6 @@ const DashboardNav = () => {
             <a href="/dashboard/manufacturers" className="text-muted-foreground hover:text-foreground">
               Manufacturers
             </a>
-            <a href="/dashboard/team" className="text-muted-foreground hover:text-foreground">
-              Team
-            </a>
           </div>
           <Button variant="ghost" onClick={handleSignOut}>
             Sign out
