@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 type AuthFormProps = {
   mode: "signin" | "signup";
@@ -22,18 +23,33 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     setLoading(true);
 
     try {
-      // TODO: Integrate with Supabase Auth
-      console.log("Auth submission:", { email, password, mode });
-      toast({
-        title: "Success!",
-        description: mode === "signin" ? "Welcome back!" : "Account created successfully!",
-      });
-      navigate("/dashboard");
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast({
+          title: "Success!",
+          description: "Please check your email to confirm your account.",
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast({
+          title: "Welcome back!",
+          description: "You have been successfully signed in.",
+        });
+        navigate("/dashboard");
+      }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An error occurred. Please try again.",
+        description: error instanceof Error ? error.message : "An error occurred",
       });
     } finally {
       setLoading(false);

@@ -1,13 +1,28 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { signOut } from "@/lib/supabase";
+import { useToast } from "@/components/ui/use-toast";
 
 const DashboardNav = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSignOut = () => {
-    // TODO: Implement sign out with Supabase
-    navigate("/");
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account.",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+      });
+    }
   };
 
   return (
