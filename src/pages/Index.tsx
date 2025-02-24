@@ -103,6 +103,7 @@ const Index = () => {
                   <Button 
                     className={`w-full ${plan.popular ? 'premium-button' : ''}`}
                     variant={plan.popular ? "default" : "outline"}
+                    onClick={() => window.location.href = '/signup'}
                   >
                     Get Started
                   </Button>
