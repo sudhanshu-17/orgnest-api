@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
+import { Product, Manufacturer } from '@/types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -21,7 +22,13 @@ export const signOut = async () => {
 export const getProducts = async () => {
   const { data, error } = await supabase
     .from('products')
-    .select('*');
+    .select(`
+      *,
+      manufacturer:manufacturers(
+        id,
+        name
+      )
+    `);
   if (error) throw error;
   return data;
 };
@@ -63,7 +70,7 @@ export const deleteProduct = async (id: string) => {
   if (error) throw error;
 };
 
-export const createManufacturer = async (manufacturer: Omit<Manufacturer, 'id'>) => {
+export const createManufacturer = async (manufacturer: Omit<Manufacturer, 'id' | 'productsCount'>) => {
   const { data, error } = await supabase
     .from('manufacturers')
     .insert([manufacturer])
@@ -90,4 +97,23 @@ export const deleteManufacturer = async (id: string) => {
     .delete()
     .eq('id', id);
   if (error) throw error;
+};
+
+// Storage utilities
+export const uploadImage = async (file: File, bucket: 'products' | 'manufacturers') => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random()}.${fileExt}`;
+  const filePath = `${bucket}/${fileName}`;
+
+  const { error: uploadError, data } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file);
+
+  if (uploadError) throw uploadError;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(filePath);
+
+  return publicUrl;
 };
