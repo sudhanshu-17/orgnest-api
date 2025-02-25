@@ -2,8 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, Manufacturer } from '@/types';
 
+// Use import.meta.env to access Vite environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
